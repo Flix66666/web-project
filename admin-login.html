@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | AI Plagiarism Detector</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  >
+</head>
+<body>
+
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      <div class="text-center">
+        <span class="admin-badge">Admin Portal</span>
+      </div>
+
+      <h2>Restricted Access</h2>
+      <p class="subtitle">Enter admin credentials to continue</p>
+
+      <form id="adminForm">
+        <div class="form-group">
+          <label for="email">Admin Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="admin@example.com"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter admin password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          Login as Admin
+        </button>
+      </form>
+
+      <div class="back-link">
+        <a href="login.html">← Back to User Login</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Admin Login Logic -->
+  <script type="module">
+    import { login } from "./js/auth.js";
+
+    document.getElementById("adminForm").onsubmit = (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        const user = login(email, password);
+
+        if (user.role !== "admin") {
+          alert("Not an admin account");
+          return;
+        }
+
+        window.location.href = "admin-dashboard.html";
+      } catch {
+        alert("Invalid admin credentials");
+      }
+    };
+  </script>
+
+  <!-- Utils -->
+  <script type="module" src="./js/utils.js"></script>
+</body>
+</html>

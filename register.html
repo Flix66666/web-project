@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | AI Plagiarism Detector</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  >
+</head>
+<body>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <h2>Create Account</h2>
+      <p class="subtitle">Register to start analyzing code</p>
+
+      <div class="form-group">
+        <input
+          type="email"
+          id="email"
+          placeholder="Email"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          required
+        >
+      </div>
+
+      <button
+        id="registerBtn"
+        class="btn btn-primary btn-block"
+      >
+        Register
+      </button>
+
+      <div class="auth-links">
+        <a href="login.html">Back to Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Logic -->
+  <script type="module">
+    import { register } from "./js/auth.js";
+
+    document.getElementById("registerBtn").onclick = () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        alert("Fill all fields");
+        return;
+      }
+
+      try {
+        register(email, password);
+        alert("Account created! You can now login.");
+        window.location.href = "login.html";
+      } catch (err) {
+        alert(err.message);
+      }
+    };
+  </script>
+
+  <!-- Utils -->
+  <script type="module" src="./js/utils.js"></script>
+</body>
+</html>

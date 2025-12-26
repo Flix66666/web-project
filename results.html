@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plagiarism Results | AI Plagiarism Detector</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="results-container">
+    <h2>Plagiarism Analysis Result</h2>
+
+    <div class="score-row">
+      <div class="score-card score-card-before">
+        <div class="score-label">Before</div>
+        <div id="beforeScore"></div>
+      </div>
+
+      <div class="score-card score-card-after">
+        <div class="score-label">After</div>
+        <div id="afterScore"></div>
+      </div>
+    </div>
+
+    <button id="rewriteBtn">Remove Plagiarism</button>
+
+    <h3>Cleaned Code</h3>
+    <pre id="cleanedCode"></pre>
+
+    <div class="export-buttons">
+      <div class="export-grid">
+        <button id="downloadTxtBtn">Download TXT</button>
+        <button id="downloadHtmlBtn">Download HTML</button>
+        <button id="downloadPdfBtn">Download PDF</button>
+        <button id="downloadDocBtn">Download DOC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Logic -->
+  <script type="module">
+    import {
+      analyzeAICodeLikelihood,
+      concludeAIDetection,
+      rewriteAndReduce
+    } from "./js/plagiarism-detector.js";
+
+    import {
+      downloadTXT,
+      downloadHTML,
+      downloadDOC
+    } from "./js/export.js";
+
+    import {
+      saveHistory,
+      isUserBanned,
+      detectLanguage
+    } from "./js/utils.js";
+
+    /* ───────────── SESSION CHECK ───────────── */
+
+    const session = JSON.parse(localStorage.getItem("session"));
+    if (session && isUserBanned(session.email)) {
+      alert("Your account is banned.");
+      location.href = "login.html";
+    }
+
+    /* ───────────── LOAD CODE ───────────── */
+
+    const originalCode = localStorage.getItem("lastCode");
+    if (!originalCode) {
+      alert("No code found.");
+      location.href = "upload.html";
+    }
+
+    /* ───────────── BEFORE ANALYSIS ───────────── */
+
+    const analysisBefore = analyzeAICodeLikelihood(originalCode);
+
+    document.getElementById("beforeScore").innerText =
+      analysisBefore.likelihood + "%";
+
+    document.getElementById("afterScore").innerText =
+      concludeAIDetection(analysisBefore);
+
+    let cleanedCode = "";
+    let analysisAfter = null;
+
+    /* ───────────── REWRITE BUTTON ───────────── */
+
+    document.getElementById("rewriteBtn").onclick = () => {
+      const result = rewriteAndReduce(originalCode);
+
+      cleanedCode = result.rewritten;
+      analysisAfter = result.after;
+
+      document.getElementById("cleanedCode").innerText = cleanedCode;
+      document.getElementById("afterScore").innerText =
+        analysisAfter.likelihood + "%";
+
+      saveHistory({
+        email: session?.email || "unknown",
+        date: new Date().toLocaleString(),
+        before: result.before.likelihood,
+        after: result.after.likelihood,
+        language: detectLanguage(originalCode),
+        cleanedCode
+      });
+
+      localStorage.setItem("cleanedCode", cleanedCode);
+    };
+
+    /* ───────────── EXPORTS ───────────── */
+
+    document.getElementById("downloadTxtBtn").onclick = () => {
+      if (!cleanedCode) return alert("Clean code first!");
+      downloadTXT("cleaned-code.txt", cleanedCode);
+    };
+
+    document.getElementById("downloadHtmlBtn").onclick = () => {
+      if (!cleanedCode) return alert("Clean code first!");
+
+      downloadHTML(
+        "plagiarism-report.html",
+        `
+        <h1>AI Code Analysis Report</h1>
+        <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>Language:</strong> ${detectLanguage(originalCode)}</p>
+        <p><strong>AI Likelihood (Before):</strong> ${analysisBefore.likelihood}%</p>
+        <p><strong>AI Likelihood (After):</strong> ${analysisAfter.likelihood}%</p>
+        <p>${concludeAIDetection(analysisAfter)}</p>
+        <hr>
+        <pre>${cleanedCode.replace(/</g, "&lt;")}</pre>
+        `
+      );
+    };
+
+    document.getElementById("downloadPdfBtn").onclick = () => {
+      if (!cleanedCode) return alert("Clean code first!");
+
+      const w = window.open("");
+      w.document.write(`
+        <h1>AI Code Analysis Report</h1>
+        <p>Date: ${new Date().toLocaleString()}</p>
+        <p>Language: ${detectLanguage(originalCode)}</p>
+        <p>AI Likelihood (Before): ${analysisBefore.likelihood}%</p>
+        <p>AI Likelihood (After): ${analysisAfter.likelihood}%</p>
+        <p>${concludeAIDetection(analysisAfter)}</p>
+        <pre>${cleanedCode.replace(/</g, "&lt;")}</pre>
+      `);
+      w.document.close();
+      w.print();
+    };
+
+    document.getElementById("downloadDocBtn").onclick = () => {
+      if (!cleanedCode) return alert("Clean code first!");
+
+      downloadDOC(
+        "plagiarism-report.doc",
+        `
+        <h1>AI Code Analysis Report</h1>
+        <p>Date: ${new Date().toLocaleString()}</p>
+        <p>Language: ${detectLanguage(originalCode)}</p>
+        <p>AI Likelihood (Before): ${analysisBefore.likelihood}%</p>
+        <p>AI Likelihood (After): ${analysisAfter.likelihood}%</p>
+        <p>${concludeAIDetection(analysisAfter)}</p>
+        <pre>${cleanedCode.replace(/</g, "&lt;")}</pre>
+        `
+      );
+    };
+  </script>
+</body>
+</html>

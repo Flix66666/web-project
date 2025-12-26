@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | AI Plagiarism Detector</title>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <h1>Admin Dashboard</h1>
+  <p>All User Submissions</p>
+
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Date</th>
+        <th>Before %</th>
+        <th>After %</th>
+        <th>Status</th>
+        <th>Action</th>
+        <th>Language</th>
+      </tr>
+    </thead>
+    <tbody id="adminTable"></tbody>
+  </table>
+
+  <!-- Admin Logic -->
+  <script type="module" src="./js/admin.js"></script>
+
+  <!-- Utils -->
+  <script type="module" src="./js/utils.js"></script>
+</body>
+</html>
